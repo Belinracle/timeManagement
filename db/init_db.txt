@@ -1,0 +1,31 @@
+insert into users values ('test','test');
+insert into users values ('daniel','password');
+
+
+insert into disciplines values(default,'Общие', 'Общие задачи по жизни');
+insert into tasks values (default,(select id from disciplines where disciplines.name='Общие'),'Прочитать книги','Книги которые нужно прочитать чтобы стать человеком');
+insert into subtasks values (default,(select id from tasks where name='Прочитать книги'),'Преступление и наказание', 'Книга такая то крутая потому что прочитаь надо поэтому');
+insert into subtasks values (default,(select id from tasks where name='Прочитать книги'),'Война и мир', 'Книга такая то крутая потому что прочитаь надо поэтому');
+
+insert into disciplines values(default,'Матеша', 'Мотемотика ИТМО 2021');
+insert into tasks values (default,(select id from disciplines where disciplines.name='Матеша'),'контрольные','контрольные препод такой');
+insert into subtasks values (default,(select id from tasks where name='контрольные'),'КР1', 'Контрольная 1 тема такая сделать это');
+insert into subtasks values (default,(select id from tasks where name='контрольные'),'КР2', 'Контрольная 2 тема такая сделать такое');
+
+insert into disciplines values(default,'ОС', 'Операционные системы ИТМО');
+insert into tasks values (default,(select id from disciplines where disciplines.name='ОС'),'Лабы','Лабы которые надо сдать');
+insert into subtasks values (default,(select id from tasks where name='Лабы'),'Лаб1','Лаба 1 такая то сделать графики');
+insert into subtasks values (default,(select id from tasks where name='Лабы'),'Лаб2','Лаба 2 такая то сделать модуль ядра');
+
+insert into disciplines values(default,'БД', 'Базы данных ИТМО');
+insert into tasks values (default,(select id from disciplines where disciplines.name='БД'),'ЛабыБД','Лабы которые надо сдать');
+insert into subtasks values (default,(select id from tasks where name='ЛабыБД'),'Лаб1','Лаба 1 такая то сделать таблицу');
+insert into subtasks values (default,(select id from tasks where name='ЛабыБД'),'Лаб2','Лаба 2 такая то сделать еще что то');
+insert into subtasks values (default,(select id from tasks where name='ЛабыБД'),'Лаб3','Лаба 3 такая то сделать еще что то');
+insert into subtasks values (default,(select id from tasks where name='ЛабыБД'),'Лаб4','Лаба 4 такая то сделать еще что то');
+
+
+insert into discipline_user values ((select id from disciplines where disciplines.name='Общие'),'test');
+insert into discipline_user values ((select id from disciplines where disciplines.name='Матеша'),'test');
+insert into discipline_user values ((select id from disciplines where disciplines.name='ОС'),'daniel');
+insert into discipline_user values ((select id from disciplines where disciplines.name='БД'),'test');

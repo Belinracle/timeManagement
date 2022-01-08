@@ -1,0 +1,60 @@
+create table users(
+  username varchar(20) not null primary key ,
+  password varchar(30) not null
+);
+
+create table disciplines(
+    id serial primary key,
+    name varchar(30) not null,
+    description text
+);
+
+create table discipline_user(
+    discipline_id integer references disciplines(id) on delete cascade on update cascade not null primary key,
+    username varchar(20) not null references users(username) on delete cascade on update cascade not null
+);
+
+create table tasks(
+    id serial not null primary key,
+    name varchar(30) not null,
+    description text not null,
+    deadline timestamptz
+);
+
+create table subtasks(
+    id serial not null primary key,
+    name varchar(30) not null,
+    description text not null,
+    deadline timestamptz,
+    is_done boolean default false
+);
+
+create table groups(
+    id serial primary key,
+    name varchar(30) not null,
+    description text
+);
+
+create table groups_users(
+    group_id integer references groups(id),
+    username varchar references users(username),
+    primary key (group_id,username)
+);
+
+create table disciplines_groups(
+    group_id integer references groups(id),
+    discipline_id integer references disciplines(id),
+    primary key (group_id)
+);
+
+create table label(
+    id serial primary key,
+    name varchar(20),
+    description text
+);
+
+create table label_tasks(
+    label_id integer references label(id),
+    task_id integer references tasks(id),
+    primary key(label_id,task_id)
+);
