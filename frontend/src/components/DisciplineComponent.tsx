@@ -29,12 +29,12 @@ const useStyles = makeStyles((theme: Theme) =>
             color: '#fff'
         },
         card: {
-            marginTop: theme.spacing(10)
+            marginTop: theme.spacing(5)
         }
     })
 );
 
-type State = {
+type DisciplineComponentState = {
     name: string
     description: string
     isButtonDisabled: boolean
@@ -48,7 +48,7 @@ type ActionType = { type: 'setName', payload: string }
     | { type: 'setIsButtonDisabled', payload: boolean }
     | { type: 'updateDiscipline', payload: DisciplineData }
 
-const reducer = (state: State, action: ActionType): State => {
+const reducer = (state: DisciplineComponentState, action: ActionType): DisciplineComponentState => {
     switch (action.type) {
         case 'setName':
             return {
@@ -81,7 +81,7 @@ const reducer = (state: State, action: ActionType): State => {
 
 export const DisciplineComponent = (prop: { discipline: DisciplineData, node: TreeNode, updateNodesCB:any }) => {
 
-    const initialState: State = {
+    const initialState: DisciplineComponentState = {
         name: '',
         description: '',
         isButtonDisabled: true,
@@ -101,7 +101,7 @@ export const DisciplineComponent = (prop: { discipline: DisciplineData, node: Tr
             type: 'setDescription',
             payload: prop.discipline.description
         });
-    }, [])
+    }, [prop])
 
     useEffect(() => {
         if (state.name.trim() && state.description.trim()) {
@@ -133,8 +133,6 @@ export const DisciplineComponent = (prop: { discipline: DisciplineData, node: Tr
 
     const handleDescriptionChange: React.ChangeEventHandler<HTMLInputElement> =
         (event) => {
-            console.log("description changed here is state current before updating")
-            console.log(state)
             dispatch({
                 type: 'setDescription',
                 payload: event.target.value

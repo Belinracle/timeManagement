@@ -1,6 +1,7 @@
 import {simpleJSON, specialURIList} from "../http-common";
 import DisciplineData from "../types/Discipline";
 import SubtaskData from "../types/Subtask";
+import TaskData from "../types/Task";
 
 const getTaskSubtasks = (taskId: number) => {
     return simpleJSON.get<DisciplineData>(`/tasks/${taskId}/subtasks`)
@@ -36,9 +37,19 @@ const deleteTask = (taskId: number) => {
         )
 }
 
+const updateTask = (taskId: number | undefined, newTaskState: TaskData)=>{
+    return simpleJSON.put(`/tasks/${taskId}`,newTaskState)
+        .then((response: any) => {
+                console.log("обновили задачу")
+                console.log(response)
+            }
+        )
+}
+
 const TaskService = {
     getTaskSubtasks,
     addSubtask,
-    deleteTask
+    deleteTask,
+    updateTask
 }
 export default TaskService

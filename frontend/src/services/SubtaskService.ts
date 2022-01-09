@@ -1,7 +1,8 @@
 import {simpleJSON} from "../http-common";
 import SubtaskData from "../types/Subtask";
+import TaskData from "../types/Task";
 
-const updateSubtask = (subtaskId: number, updatedSubtask: SubtaskData) => {
+const updateSubtask = (subtaskId: number | undefined, updatedSubtask: TaskData) => {
     return simpleJSON.put(`/subtasks/${subtaskId}`, updatedSubtask)
         .then((response: any) => {
             console.log("бновилась подзадача")

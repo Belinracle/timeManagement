@@ -6,6 +6,8 @@ import {useParams} from "react-router-dom";
 
 export const Description=(prop: {node:TreeNode | undefined, updateNodesCB:any})=>{
 
+
+
     switch (prop?.node?.data.type){
         case 'discipline':
             return <DisciplineComponent
@@ -14,7 +16,10 @@ export const Description=(prop: {node:TreeNode | undefined, updateNodesCB:any})=
                 updateNodesCB={prop.updateNodesCB}
             />
         case 'task':
-            return <TaskComponent/>
+            return <TaskComponent
+                task={prop?.node?.data}
+                node={prop?.node}
+            />
         case 'subtask':
             return <SubtaskComponent/>
     }
