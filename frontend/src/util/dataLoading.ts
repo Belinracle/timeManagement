@@ -14,7 +14,7 @@ export const loadTasksForDiscipline = (disc: DisciplineData) => {
 }
 
 export const loadSubtasksForTask = (task: TaskData) => {
-    return TaskService.getTaskSubtasks(task.id)
+    return TaskService.getTaskSubtasks(Number(task.id!.toString()))
         .then((subtasks: Array<SubtaskData>) => {
             task.subtasks = subtasks
         })
@@ -39,6 +39,7 @@ export const loadSubtasks = (disciplines: DisciplineData[]) => {
 }
 
 export const convertSubtaskToTreeNode = (subtask: SubtaskData, taskKey: string) => {
+    // @ts-ignore
     let subtaskKey = taskKey.concat('-').concat(subtask.id.toString())
     return {
         key: subtaskKey,
@@ -71,7 +72,7 @@ export const findDoneSubtasksNodeKeys = (treeNodes: TreeNode[]) => {
     return selectedKeys
 }
 export const convertTaskToTreeNode = (task: TaskData, disciplineId: string) => {
-    const taskKey = disciplineId.concat('-').concat(<string>task?.id.toString());
+    const taskKey = disciplineId.concat('-').concat(<string>task?.id?.toString());
     return {
         key: taskKey,
         label: task.name,
@@ -96,13 +97,13 @@ export const convertDisciplineToTreeNode = (disc: DisciplineData) => {
         label: disc.name,
         selectable: false,
         data: {...disc, type: 'discipline'},
-        children: convertTasksToTreeNode(disc.tasks, discKey)
+        children: convertTasksToTreeNode(disc.tasks, discKey),
     }
 }
 
-export const generateTreeNodes = (disciplines: DisciplineData[]) => {
+export const generateTreeNodes = (disciplines: DisciplineData[] | undefined) => {
     let nodes: TreeNode[] = [];
-    disciplines.map((disc) => {
+    disciplines?.map((disc) => {
         nodes.push(convertDisciplineToTreeNode(disc))
     })
     return nodes;

@@ -1,7 +1,7 @@
 import SubtaskData from "./Subtask";
 
 export default interface TaskData {
-    id: number,
+    id?: number,
     name: string,
     description: any
     subtasks?:Array<SubtaskData>

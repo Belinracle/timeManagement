@@ -22,6 +22,6 @@ public class Discipline {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "discipline")
+    @OneToMany(mappedBy = "discipline", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Task> tasks;
 }

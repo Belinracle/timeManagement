@@ -2,6 +2,7 @@ package itmo.s285594.backend.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -17,8 +18,8 @@ public class Task {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "discipline_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "discipline_id")
     private Discipline discipline;
 
     @Column(name = "name", nullable = false, length = 30)
@@ -30,7 +31,7 @@ public class Task {
     @Column(name = "deadline")
     private OffsetDateTime deadline;
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Subtask> subtasks;
 
 }

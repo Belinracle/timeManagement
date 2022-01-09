@@ -1,6 +1,10 @@
 import TreeNode from "primereact/treenode";
-import {useEffect} from "react";
 
 export const Description=(prop: {node:TreeNode | undefined})=>{
-    return <div>{prop?.node?.key}</div>
+
+    if(prop?.node?.data.type==='subtask') {
+        console.log(prop?.node?.data)
+        return <div>{prop?.node?.data.name}</div>
+    }
+    else return <div>{prop?.node?.data.type}</div>
 }

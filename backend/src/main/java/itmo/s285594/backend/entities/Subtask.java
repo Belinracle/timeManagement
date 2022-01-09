@@ -2,6 +2,8 @@ package itmo.s285594.backend.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
@@ -16,8 +18,9 @@ public class Subtask {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "task_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Task task;
 
     @Column(name = "name", nullable = false, length = 30)

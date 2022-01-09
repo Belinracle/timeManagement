@@ -1,6 +1,6 @@
 export default interface SubtaskData {
-    id: number,
+    id?: number,
     name: string,
-    description: any
+    description?: any
     isDone: boolean
 }
