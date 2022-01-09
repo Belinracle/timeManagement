@@ -18,8 +18,8 @@ const Header = () => {
         navigate("/");
     }
     return (
-        <Paper  elevation={3} className={classes.header}>
-            <Grid container spacing={2}>
+        <Paper className={classes.header}>
+            <Grid container>
                 <Grid item sm={10} md={10}>
                     Time Management App <br/>
                     P33301 Dzhukashev Daniel

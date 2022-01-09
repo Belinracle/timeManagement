@@ -91,6 +91,7 @@ export const convertTasksToTreeNode = (tasks: Array<TaskData> | undefined, disci
 }
 
 export const convertDisciplineToTreeNode = (disc: DisciplineData) => {
+    // @ts-ignore
     let discKey = disc.id.toString();
     return {
         key: discKey,

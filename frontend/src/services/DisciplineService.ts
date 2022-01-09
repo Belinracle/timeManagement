@@ -3,7 +3,7 @@ import DisciplineData from "../types/Discipline";
 import TaskData from "../types/Task";
 import SubtaskData from "../types/Subtask";
 
-const getDisciplineTasks = (disciplineId: number) => {
+const getDisciplineTasks = (disciplineId: number | undefined) => {
     return simpleJSON.get<DisciplineData>(`/disciplines/${disciplineId}/tasks`)
         .then((response: any) => {
             return response.data._embedded.tasks
@@ -37,9 +37,14 @@ const deleteDiscipline = (disciplineId: number) => {
         )
 }
 
+const updateDiscipline = (disciplineId: number | undefined, newDisciplineState: DisciplineData) => {
+    return simpleJSON.put(`/disciplines/${disciplineId}`,newDisciplineState)
+}
+
 const DisciplineService = {
     getDisciplineTasks,
     addTask,
-    deleteDiscipline
+    deleteDiscipline,
+    updateDiscipline
 }
 export default DisciplineService
