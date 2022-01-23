@@ -79,7 +79,7 @@ const reducer = (state: DisciplineComponentState, action: ActionType): Disciplin
     }
 }
 
-export const DisciplineComponent = (prop: { discipline: DisciplineData, node: TreeNode, updateNodesCB:any }) => {
+export const DisciplineComponent = (prop: { discipline: DisciplineData | undefined, node: TreeNode, updateCB: any, mutable: boolean }) => {
 
     const initialState: DisciplineComponentState = {
         name: '',
@@ -95,11 +95,11 @@ export const DisciplineComponent = (prop: { discipline: DisciplineData, node: Tr
     useEffect(() => {
         dispatch({
             type: 'setName',
-            payload: prop.discipline.name
+            payload: prop.discipline!.name
         });
         dispatch({
             type: 'setDescription',
-            payload: prop.discipline.description
+            payload: prop.discipline!.description
         });
     }, [prop])
 
@@ -119,7 +119,6 @@ export const DisciplineComponent = (prop: { discipline: DisciplineData, node: Tr
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.keyCode === 13 || event.which === 13) {
-            console.log(event)
         }
     };
 
@@ -144,57 +143,74 @@ export const DisciplineComponent = (prop: { discipline: DisciplineData, node: Tr
             name: state.name,
             description: state.description,
         }
-        DisciplineService.updateDiscipline(prop.discipline.id,newDisciplineState)
-            .then((response)=>{
-                console.log('updated discipline')
-                console.log(response)
-                prop.node.label = state.name
-                prop.updateNodesCB()
+        // @ts-ignore
+        DisciplineService.updateDiscipline(prop.discipline.id, newDisciplineState)
+            .then((response) => {
+                // console.log('updated discipline')
+                // console.log(response)
+                prop.updateCB()
             })
     }
 
-    return (
+    if(prop.mutable) {
+        return (
+            <div>
+                <form className={classes.container} noValidate autoComplete="off">
+                    <Card className={classes.card}>
+                        <CardHeader className={classes.header} title="This is Discipline"/>
+                        <CardContent>
+                            <div>
+                                <TextField
+                                    error={state.isError}
+                                    fullWidth
+                                    value={state.name}
+                                    id="name"
+                                    label="Name"
+                                    placeholder="Discipline name"
+                                    margin="normal"
+                                    onChange={handleNameChange}
+                                    onKeyPress={handleKeyPress}
+                                />
+                                <TextField
+                                    error={state.isError}
+                                    fullWidth
+                                    value={state.description}
+                                    id="description"
+                                    label="Description"
+                                    placeholder="Description of Discipline"
+                                    margin="normal"
+                                    helperText={state.helperText}
+                                    onChange={handleDescriptionChange}
+                                    onKeyPress={handleKeyPress}
+                                />
+                            </div>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                className={classes.loginBtn}
+                                onClick={handleSaveClick}
+                                disabled={state.isButtonDisabled}>
+                                Save
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </form>
+            </div>
+        )
+    }else return(
         <div>
             <form className={classes.container} noValidate autoComplete="off">
                 <Card className={classes.card}>
-                    <CardHeader className={classes.header} title="This is Discipline"/>
+                    <CardHeader className={classes.header} title="This is Subtask"/>
                     <CardContent>
                         <div>
-                            <TextField
-                                error={state.isError}
-                                fullWidth
-                                value={state.name}
-                                id="name"
-                                label="Name"
-                                placeholder="Discipline name"
-                                margin="normal"
-                                onChange={handleNameChange}
-                                onKeyPress={handleKeyPress}
-                            />
-                            <TextField
-                                error={state.isError}
-                                fullWidth
-                                value={state.description}
-                                id="description"
-                                label="Description"
-                                placeholder="Description of Discipline"
-                                margin="normal"
-                                helperText={state.helperText}
-                                onChange={handleDescriptionChange}
-                                onKeyPress={handleKeyPress}
-                            />
+                            <div> Discipline name: {prop.discipline!.name}</div>
+                            <div> Discipline Description: {prop.discipline!.description}</div>
+
                         </div>
                     </CardContent>
-                    <CardActions>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            className={classes.loginBtn}
-                            onClick={handleSaveClick}
-                            disabled={state.isButtonDisabled}>
-                            Save
-                        </Button>
-                    </CardActions>
                 </Card>
             </form>
         </div>

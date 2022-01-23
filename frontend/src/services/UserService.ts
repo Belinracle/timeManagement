@@ -1,6 +1,7 @@
 import {simpleJSON, specialURIList} from "../http-common";
 import UserData from "../types/User";
 import DisciplineData from "../types/Discipline";
+import GroupData from "../types/Group";
 
 const getAll = () => {
     return simpleJSON.get<Array<UserData>>("/users");
@@ -18,8 +19,9 @@ const addDiscipline = (userName: string, newDiscipline: DisciplineData) => {
 
     let postedNewDiscipline = simpleJSON.post(`/disciplines`, newDiscipline)
         .then((response) => {
-            return response })
-    return postedNewDiscipline.then((newDiscipline)=>{
+            return response
+        })
+    return postedNewDiscipline.then((newDiscipline) => {
         return simpleJSON.post(`/disciplineUsers`,
             {
                 id: {
@@ -39,11 +41,19 @@ const getUserDisciplines = (username: string) => {
         );
 }
 
+const getUserGroups = (username: string) => {
+    return simpleJSON.get<GroupData>(`/users/${username}/groups`)
+        .then((response: any) => {
+                return response.data._embedded.groupsUsers;
+            }
+        );
+}
 const UserService = {
     getAll,
     get,
     create,
     getUserDisciplines,
+    getUserGroups,
     addDiscipline
 }
 export default UserService

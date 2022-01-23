@@ -81,7 +81,7 @@ const reducer = (state: TaskComponentState, action: ActionType): TaskComponentSt
     }
 }
 
-export const TaskComponent = (prop: { task: TaskData, node: TreeNode}) => {
+export const TaskComponent = (prop: { task: TaskData, node: TreeNode, updateCB: any, mutable: boolean}) => {
 
     const initialState: TaskComponentState = {
         name: '',
@@ -142,9 +142,8 @@ export const TaskComponent = (prop: { task: TaskData, node: TreeNode}) => {
         }
         TaskService.updateTask(prop.task.id,newTaskState)
             .then((response)=>{
-                console.log('updated task')
-                console.log(response)
-                prop.node.label = state.name
+                // console.log('updated task');
+                prop.updateCB()
             })
     }
 

@@ -40,8 +40,8 @@ const deleteTask = (taskId: number) => {
 const updateTask = (taskId: number | undefined, newTaskState: TaskData)=>{
     return simpleJSON.put(`/tasks/${taskId}`,newTaskState)
         .then((response: any) => {
-                console.log("обновили задачу")
-                console.log(response)
+                // console.log("обновили задачу")
+                // console.log(response)
             }
         )
 }

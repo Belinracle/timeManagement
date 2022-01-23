@@ -127,7 +127,6 @@ const Login = () => {
                         type: 'loginSuccess',
                         payload: 'Login Successfully'
                     });
-                    console.log(response.disciplineSet)
                     localStorage.setItem("username", state.username);
                     navigate("/main");
                 } else {
@@ -154,14 +153,14 @@ const Login = () => {
                     payload: 'User with this username already exists'
                 });
             }).catch((e: Error) => {
-            console.log("User doesn't exist, so create him");
+            // console.log("User doesn't exist, so create him");
             UserService.create({
                 id: state.username,
                 password: state.password,
                 disciplineSet:[]
             })
                 .then((response: any) => {
-                    console.log("User created");
+                    // console.log("User created");
                 })
                 .catch((e: Error) => {
                     console.log("Error while creating user");

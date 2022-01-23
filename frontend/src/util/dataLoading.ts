@@ -5,12 +5,23 @@ import TaskService from "../services/TaskService";
 import SubtaskData from "../types/Subtask";
 import TreeNode from "primereact/treenode";
 import {TreeCheckboxSelectionKeys} from "primereact/tree";
+import GroupData from "../types/Group";
+import {simpleJSON} from "../http-common";
+import GroupService from "../services/GroupService";
 
 export const loadTasksForDiscipline = (disc: DisciplineData) => {
     return DisciplineService.getDisciplineTasks(disc.id)
         .then((tasks: Array<TaskData>) => {
             disc.tasks = tasks;
         })
+}
+
+export const loadDisciplineForGroup = (group: GroupData) => {
+    return GroupService.getGroupDisciplines(group.id)
+        .then((disciplines: Array<DisciplineData>) => {
+            group.disciplines = disciplines;
+        }).then(()=>loadTasks(group.disciplines!))
+        .then(()=>loadSubtasks(group.disciplines!))
 }
 
 export const loadSubtasksForTask = (task: TaskData) => {
@@ -38,6 +49,43 @@ export const loadSubtasks = (disciplines: DisciplineData[]) => {
     return Promise.all(promises);
 }
 
+export const loadDisciplinesForGroups=(groups:GroupData[])=>{
+    let promises: Array<Promise<void>> = [];
+    groups.map((group) => {
+        // @ts-ignore
+        return promises.push(loadDisciplineForGroup(group));
+    })
+    return Promise.all(promises);
+}
+
+export const loadGroupFromUserGroups = (userGroupId: number, canModify: boolean, groups: GroupData[]) => {
+    console.log("loading group from user groupe with attribute can modify")
+    console.log(canModify)
+    return simpleJSON.get<GroupData>(`/groupsUsers/${userGroupId}/group`)
+        .then((response) => {
+            console.log("loaded group")
+            groups.push({
+                id: response.data.id,
+                name: response.data.name,
+                description: response.data.description,
+                canmodify: canModify
+            })
+        })
+}
+
+export const loadGroups = (userGroups: { id: number; canmodify: boolean; }[], groups: GroupData[]) => {
+    console.log("loading groups")
+    console.log(userGroups)
+    let promises: Array<Promise<void>> = [];
+    userGroups.map((userGroup) => {
+        promises.push(loadGroupFromUserGroups(userGroup.id, userGroup.canmodify, groups))
+    })
+    return Promise.all(promises).then(()=>{
+        groups
+            .sort((a: GroupData, b: GroupData) => a.name > b.name ? 1 : -1)
+    });
+}
+
 export const convertSubtaskToTreeNode = (subtask: SubtaskData, taskKey: string) => {
     // @ts-ignore
     let subtaskKey = taskKey.concat('-').concat(subtask.id.toString())
@@ -53,7 +101,7 @@ export const convertSubtaskToTreeNode = (subtask: SubtaskData, taskKey: string) 
 export const convertSubtasksToTreeNode = (subtasks: Array<SubtaskData> | undefined, taskKey: string) => {
     let subtaskNodes: Array<TreeNode> = []
     subtasks?.map((subtask) => {
-        subtaskNodes.push(convertSubtaskToTreeNode(subtask,taskKey))
+        subtaskNodes.push(convertSubtaskToTreeNode(subtask, taskKey))
     })
     return subtaskNodes
 }

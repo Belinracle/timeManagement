@@ -11,6 +11,8 @@ import TreeNode from "primereact/treenode";
 import SubtaskData from "../types/Subtask";
 import TaskData from "../types/Task";
 import SubtaskService from "../services/SubtaskService";
+import {InputSwitch} from "primereact/inputswitch";
+import {Calendar} from "primereact/calendar";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,6 +42,7 @@ type SubtaskComponentState = {
     name: string
     description: string
     isDone: boolean
+    deadline?: Date | Date[]
     isButtonDisabled: boolean
     helperText: string
     isError: boolean
@@ -48,6 +51,7 @@ type SubtaskComponentState = {
 type ActionType = { type: 'setName', payload: string }
     | { type: 'setDescription', payload: string }
     | { type: 'setIsDone', payload: boolean }
+    | { type: 'setDeadline', payload?: Date | Date[] }
     | { type: 'setIsError', payload: boolean }
     | { type: 'setIsButtonDisabled', payload: boolean }
 
@@ -68,6 +72,11 @@ const reducer = (state: SubtaskComponentState, action: ActionType): SubtaskCompo
                 ...state,
                 description: action.payload
             };
+        case 'setDeadline':
+            return {
+                ...state,
+                deadline: action.payload
+            }
         case 'setIsError':
             return {
                 ...state,
@@ -81,12 +90,13 @@ const reducer = (state: SubtaskComponentState, action: ActionType): SubtaskCompo
     }
 }
 
-export const TaskComponent = (prop: { subtask: SubtaskData, node: TreeNode }) => {
+export const SubtaskComponent = (prop: { subtask: SubtaskData, node: TreeNode, updateCB: any, mutable: boolean }) => {
 
     const initialState: SubtaskComponentState = {
         name: '',
         description: '',
         isDone: false,
+        deadline: undefined,
         isButtonDisabled: true,
         helperText: '',
         isError: false
@@ -96,6 +106,12 @@ export const TaskComponent = (prop: { subtask: SubtaskData, node: TreeNode }) =>
     const [state, dispatch] = useReducer(reducer, initialState);
 
     useEffect(() => {
+        if(prop.subtask.deadline !== null){
+            dispatch({
+                type: 'setDeadline',
+                payload: new Date(prop.subtask.deadline!.toString())
+            })
+        }
         dispatch({
             type: 'setName',
             payload: prop.subtask.name
@@ -139,70 +155,100 @@ export const TaskComponent = (prop: { subtask: SubtaskData, node: TreeNode }) =>
                 payload: event.target.value
             });
         }
-    const handleIsDoneChange: React.ChangeEventHandler<HTMLInputElement> =
-        (event) => {
-        // console.log(i)
-        //     // dispatch({
-        //     //     type: 'setIsDone',
-        //     //     payload: event.target.value
-        //     // });
-        }
 
     const handleSaveClick = () => {
-        let newSubtaskState: TaskData = {
+        let newSubtaskState: SubtaskData = {
             name: state.name,
             description: state.description,
+            isDone: state.isDone,
+            deadline: state.deadline
         }
         SubtaskService.updateSubtask(prop.subtask.id, newSubtaskState)
             .then((response) => {
-                console.log('updated subtask')
-                console.log(response)
-                prop.node.label = state.name
+                prop.updateCB()
             })
     }
 
-    return (
-        <div>
-            <form className={classes.container} noValidate autoComplete="off">
-                <Card className={classes.card}>
-                    <CardHeader className={classes.header} title="This is Task"/>
-                    <CardContent>
-                        <div>
-                            <TextField
-                                error={state.isError}
-                                fullWidth
-                                value={state.name}
-                                id="name"
-                                label="Name"
-                                placeholder="Task name"
-                                margin="normal"
-                                onChange={handleNameChange}
-                            />
-                            <TextField
-                                error={state.isError}
-                                fullWidth
-                                value={state.description}
-                                id="description"
-                                label="Description"
-                                placeholder="Description of Task"
-                                margin="normal"
-                                helperText={state.helperText}
-                                onChange={handleDescriptionChange}
-                            />
-                        </div>
-                    </CardContent>
-                    <CardActions>
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            className={classes.loginBtn}
-                            onClick={handleSaveClick}
-                            disabled={state.isButtonDisabled}>
-                            Save
-                        </Button>
-                    </CardActions>
-                </Card>
-            </form>
-        </div>
-    )
+    // @ts-ignore
+    if (prop.mutable) {
+        return (
+            <div>
+                <form className={classes.container} noValidate autoComplete="off">
+                    <Card className={classes.card}>
+                        <CardHeader className={classes.header} title="This is Subtask"/>
+                        <CardContent>
+                            <div>
+                                <TextField
+                                    error={state.isError}
+                                    fullWidth
+                                    value={state.name}
+                                    id="name"
+                                    label="Name"
+                                    placeholder="Task name"
+                                    margin="normal"
+                                    onChange={handleNameChange}
+                                />
+                                <TextField
+                                    error={state.isError}
+                                    fullWidth
+                                    value={state.description}
+                                    id="description"
+                                    label="Description"
+                                    placeholder="Description of Task"
+                                    margin="normal"
+                                    helperText={state.helperText}
+                                    onChange={handleDescriptionChange}
+                                />
+                                <div>Выполнена</div>
+                                <InputSwitch checked={state.isDone} onChange={(e) => dispatch({
+                                    type: 'setIsDone',
+                                    payload: e.value
+                                })}/>
+                                <div>Deadline</div>
+                                <Calendar value={state.deadline}
+                                          onChange={(e) => {
+                                              dispatch({
+                                                  type: 'setDeadline',
+                                                  payload: e.value
+                                              })
+                                          }
+                                          }
+                                          monthNavigator yearNavigator yearRange="2010:2030"
+                                />
+                            </div>
+                        </CardContent>
+                        <CardActions>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                className={classes.loginBtn}
+                                onClick={handleSaveClick}
+                                disabled={state.isButtonDisabled}>
+                                Save
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </form>
+            </div>
+        )
+    }else {
+        return(
+            <div>
+                <form className={classes.container} noValidate autoComplete="off">
+                    <Card className={classes.card}>
+                        <CardHeader className={classes.header} title="This is Subtask"/>
+                        <CardContent>
+                            <div>
+                                <div> Subtask name: ${prop.subtask.name}</div>
+                                <div> Subtask Description: ${prop.subtask.description}</div>
+
+                                <div>Выполнена: ${prop.subtask.isDone}</div>
+                                <div>Deadline: ${prop.subtask.deadline}</div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </form>
+            </div>
+        )
+    }
 }

@@ -1,5 +1,5 @@
 import Header from "../components/Header";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import UserService from "../services/UserService";
 import DisciplineData from "../types/Discipline";
 import {
@@ -10,7 +10,7 @@ import {
 import TreeNode from "primereact/treenode";
 import {
     findDoneSubtasksNodeKeys,
-    generateTreeNodes,
+    generateTreeNodes, loadDisciplinesForGroups, loadGroupFromUserGroups, loadGroups,
     loadSubtasks,
     loadTasks
 } from "../util/dataLoading";
@@ -18,19 +18,19 @@ import {Toast} from "primereact/toast";
 import {ContextMenu} from "primereact/contextmenu";
 import {Description} from "../components/Description";
 import SubtaskService from "../services/SubtaskService";
-import TaskService from "../services/TaskService";
-import SubtaskData from "../types/Subtask";
-import DisciplineService from "../services/DisciplineService";
-import TaskData from "../types/Task";
 import {Button} from "primereact/button";
 import {Grid, Paper} from "@material-ui/core";
 import {addCommand, addDisciplineToTree, deleteCommand, findNodeByKey} from "../util/treeManipulating";
+import GroupData from "../types/Group";
+import {Accordion, AccordionTab} from "primereact/accordion";
+import {GroupsTrees} from "../components/GroupsTrees";
 
 
 const Main = () => {
     let username = localStorage.getItem("username");
     const [treeNodes, setTreeNodes] = useState(Array<TreeNode>());
     const [disciplines, setDisciplines] = useState<Array<DisciplineData>>();
+    let [groups, setGroups] = useState<Array<GroupData>>();
     const [selectedKeys, setSelectedKeys] = useState<TreeSelectionKeys>();
     const [selectedNodeKey, setSelectedNodeKey] = useState<string>('');
     const [describableNode, setDescribableNode] = useState<TreeNode>();
@@ -52,11 +52,6 @@ const Main = () => {
         )
     }
 
-    const onButtonAddDisciplineClick = () => {
-
-    }
-
-    // @ts-ignore
     const menu = [
         {
             label: 'Add Children',
@@ -64,7 +59,7 @@ const Main = () => {
             command: () => {
                 // @ts-ignore
                 addCommand(selectedNodeKey, treeNodes)
-                    .then(() => loadData())
+                    .then(() => loadUserData())
             }
         },
         {
@@ -73,7 +68,7 @@ const Main = () => {
             command: () => {
                 // @ts-ignore
                 deleteCommand(selectedNodeKey, treeNodes)
-                    .then(() => loadData())
+                    .then(() => loadUserData())
             }
         },
         {
@@ -87,10 +82,31 @@ const Main = () => {
     ];
 
     useEffect(() => {
-        loadData()
+        loadUserData()
+        loadUserGroupsData()
     }, [])
 
-    const loadData = () => {
+    const loadUserGroupsData = () => {
+        groups=[]
+        if (username) {
+            UserService.getUserGroups(username)
+                .then((response) => {
+                    loadGroups(response,groups!)
+                        .then(()=> {
+                            loadDisciplinesForGroups(groups!)
+                                .then(() => {
+                                    setGroups(groups)
+                                    console.log("are groups loaded?")
+                                    console.log(groups)
+                                })
+                        })
+                });
+        }
+    }
+
+    const loadUserData = () => {
+        console.log("loading data from server")
+        // console.log(selectedNodeKey)
         if (username) {
             UserService.getUserDisciplines(username).then((disc) => {
                 loadTasks(disc).then(() => loadSubtasks(disc)).then(() => {
@@ -102,34 +118,33 @@ const Main = () => {
 
     const onAddDisciplineButtonClickHandler = () => {
         if (username) {
-            // @ts-ignore
-            addDisciplineToTree(username).then(() => loadData())
+            addDisciplineToTree(username).then(() => loadUserData())
         }
     }
 
     useEffect(() => {
+        // console.log("disciplineTree changed, generating tree nodes")
         let nodes = generateTreeNodes(disciplines)
         setTreeNodes(nodes)
     }, [disciplines])
 
     useEffect(() => {
+        // console.log('treeNode changed with state')
+        // console.log(treeNodes)
         let keysSelected = findDoneSubtasksNodeKeys(treeNodes);
         setSelectedKeys(keysSelected);
+        let foundNode = findNodeByKey(selectedNodeKey, treeNodes);
+        setDescribableNode(foundNode)
     }, [treeNodes])
 
-    const updateNodes=()=>{
-        console.log('updating')
-        console.log(treeNodes)
-        setTreeNodes(treeNodes)
-    }
-
+    // @ts-ignore
     return (<div>
         <Header/>
         <Paper>
             <Grid container>
                 <Grid item sm={6} md={6}>
                     <Toast ref={toast}/>
-                    <ContextMenu model={menu} ref={cm} onHide={() => setSelectedNodeKey('')}/>
+                    <ContextMenu model={menu} ref={cm}/>
                     <div>
                         <Button label="Add discipline" icon="pi pi-plus" onClick={onAddDisciplineButtonClickHandler}/>
                         <Tree selectionMode="checkbox"
@@ -140,10 +155,6 @@ const Main = () => {
                                   if (e !== null) setSelectedKeys(e.value)
                               }}
                               value={treeNodes}
-                              onNodeClick={(param) => {
-                                  console.log("node clicked")
-                                  console.log(param.node)
-                              }}
                               contextMenuSelectionKey={selectedNodeKey}
                               onContextMenuSelectionChange={(event) => {
                                   setSelectedNodeKey(event!.value!.toString())
@@ -153,13 +164,32 @@ const Main = () => {
                 </Grid>
                 <Grid item sm={6} md={6}>
                     <Description
+                        mutable={true}
                         node={describableNode}
-                        updateNodesCB={updateNodes}
+                        updateCB={loadUserData}
                     />
                 </Grid>
             </Grid>
         </Paper>
-
+        <GroupsTrees 
+            groups={groups!}
+            updateCB={loadUserGroupsData}/>
+        {/*<Accordion multiple>*/}
+        {/*    {groups!.map((group,index) => {*/}
+        {/*         return <AccordionTab header={group.name}>*/}
+        {/*            zalupa*/}
+        {/*        </AccordionTab>*/}
+        {/*    })}*/}
+        {/*    <AccordionTab header="Header I">*/}
+        {/*        Content I*/}
+        {/*    </AccordionTab>*/}
+        {/*    <AccordionTab header="Header II">*/}
+        {/*        Content II*/}
+        {/*    </AccordionTab>*/}
+        {/*    <AccordionTab header="Header III">*/}
+        {/*        Content III*/}
+        {/*    </AccordionTab>*/}
+        {/*</Accordion>*/}
 
     </div>)
 }

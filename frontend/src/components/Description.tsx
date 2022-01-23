@@ -2,26 +2,52 @@ import TreeNode from "primereact/treenode";
 import {TaskComponent} from "./TaskComponent";
 import {DisciplineComponent} from "./DisciplineComponent";
 import {SubtaskComponent} from "./SubtaskComponent";
-import {useParams} from "react-router-dom";
+import {useEffect} from "react";
+import {Paper} from "@material-ui/core";
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles";
+import {Card} from "primereact/card";
 
-export const Description=(prop: {node:TreeNode | undefined, updateNodesCB:any})=>{
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        mock: {
+            margin: theme.spacing(5)
+        }
+    })
+);
 
 
+export const Description = (prop: { node: TreeNode | undefined, updateCB: any, mutable: boolean}) => {
 
-    switch (prop?.node?.data.type){
+    const classes = useStyles();
+
+    useEffect(() => {
+
+    }, [prop.node])
+    switch (prop?.node?.data.type) {
         case 'discipline':
             return <DisciplineComponent
+                mutable={prop.mutable}
                 discipline={prop?.node?.data}
                 node={prop?.node}
-                updateNodesCB={prop.updateNodesCB}
+                updateCB={prop.updateCB}
+
             />
         case 'task':
             return <TaskComponent
+                mutable={prop.mutable}
                 task={prop?.node?.data}
                 node={prop?.node}
+                updateCB={prop.updateCB}
             />
         case 'subtask':
-            return <SubtaskComponent/>
+            return <SubtaskComponent
+                mutable={prop.mutable}
+                subtask={prop?.node?.data}
+                node={prop?.node}
+                updateCB={prop.updateCB}
+            />
     }
-    return <div>Can't determine type of node</div>
+    return <div>
+        <Card className={classes.mock}>Choose TreeNode that you want to describe</Card>
+    </div>
 }

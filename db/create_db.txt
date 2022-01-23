@@ -38,6 +38,7 @@ create table groups(
 create table groups_users(
     group_id integer references groups(id),
     username varchar references users(username),
+    canModify boolean,
     primary key (group_id,username)
 );
 

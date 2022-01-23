@@ -1,8 +1,6 @@
 package itmo.s285594.backend;
 
-import itmo.s285594.backend.entities.Discipline;
-import itmo.s285594.backend.entities.Subtask;
-import itmo.s285594.backend.entities.Task;
+import itmo.s285594.backend.entities.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -21,6 +19,8 @@ public class BackendApplication implements RepositoryRestConfigurer {
         config.exposeIdsFor(Discipline.class);
         config.exposeIdsFor(Subtask.class);
         config.exposeIdsFor(Task.class);
+        config.exposeIdsFor(GroupsUser.class);
+        config.exposeIdsFor(Group.class);
     }
 
 }

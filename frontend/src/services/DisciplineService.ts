@@ -31,8 +31,8 @@ const addTask = (disciplineId: number, newTask: TaskData) => {
 const deleteDiscipline = (disciplineId: number) => {
     return simpleJSON.delete(`/disciplines/${disciplineId}`)
         .then((response: any) => {
-                console.log("удалили дисциплину")
-                console.log(response)
+                // console.log("удалили дисциплину")
+                // console.log(response)
             }
         )
 }

@@ -50,7 +50,7 @@ export const findNodeByKey = (key: string, treeNodes: Array<TreeNode>) => {
 }
 
 export const deleteCommand=(selectedNodeKey:any, treeNodes: Array<TreeNode>) => {
-    console.log("deleting")
+    // console.log("deleting")
     let foundNode = findNodeByKey(selectedNodeKey,treeNodes);
     switch (foundNode?.data.type) {
         case 'subtask':
@@ -64,7 +64,7 @@ export const deleteCommand=(selectedNodeKey:any, treeNodes: Array<TreeNode>) => 
 }
 
 export const addCommand=(selectedNodeKey:any, treeNodes: Array<TreeNode>) => {
-    console.log("adding child")
+    // console.log("adding child")
     let foundNode = findNodeByKey(selectedNodeKey,treeNodes);
     switch (foundNode?.data.type) {
         case 'task':
@@ -75,6 +75,6 @@ export const addCommand=(selectedNodeKey:any, treeNodes: Array<TreeNode>) => {
 }
 
 export const addDisciplineToTree=(username:string)=>{
-    console.log("adding discipline")
+    // console.log("adding discipline")
     return UserService.addDiscipline(username,newDiscipline)
 }
